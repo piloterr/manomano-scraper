@@ -198,10 +198,10 @@ Example response from the API reference, abridged — real values depend on the 
   },
   "title": "Pergola rétractable OUTSUNNY - 2,98L x 2,13l x 2,22H m - Structure métal époxy anticorrosion",
   "seller": {
-    "id": 6132097,
-    "url": "/marchand-6132097",
-    "name": "Aosom France MF",
-    "country": "FR"
+    "id": 0,
+    "url": "example",
+    "name": "example",
+    "country": "example"
   },
   "currency": "EUR",
   "delivery": {
@@ -370,9 +370,9 @@ Example response from the API reference, abridged — real values depend on the 
       "market": "B2C",
       "seller": {
         "is_m_f": false,
-        "contract_id": "36769168",
-        "contract_name": "COOCHEER",
-        "country_location": "FR"
+        "contract_id": "example",
+        "contract_name": "example",
+        "country_location": "example"
       },
       "pricing": {
         "sell_price": {},
