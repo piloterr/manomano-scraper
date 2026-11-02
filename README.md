@@ -72,7 +72,7 @@ response = requests.get(
     params={
         "query": "https://www.manomano.fr/p/pergola-retractable-298l-x-213l-x-222h-m-structure-metal-epoxy-anticorrosion-toile-polyester-haute-densite-180-g-m-incluse-gris-17786586?model_id=17784588",
     },
-    timeout=60,
+    timeout=120,
 )
 response.raise_for_status()
 data = response.json()
@@ -230,7 +230,7 @@ response = requests.get(
         "query": "28910102",
         "region": "FR",
     },
-    timeout=60,
+    timeout=120,
 )
 response.raise_for_status()
 data = response.json()
@@ -351,7 +351,7 @@ response = requests.get(
     params={
         "query": "https://www.manomano.fr/perceuse-1146",
     },
-    timeout=60,
+    timeout=120,
 )
 response.raise_for_status()
 data = response.json()
