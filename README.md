@@ -8,17 +8,17 @@
 
 The **Piloterr ManoMano Scraper API** lets you extract public data from ManoMano as **clean, structured JSON** — no proxies, headless browsers or HTML parsing to maintain. Endpoints available in production:
 
-- **ManoMano Product API** — Extract full product details from a ManoMano product page, including price, seller, brand, images, variants, and stock.
-- **ManoMano Product Offer API** — Get all marketplace seller offers for a ManoMano product by product ID, including pricing, shipping, and seller information.
-- **ManoMano Search API** — Search for products on ManoMano by category or keyword URL, returning listings with prices, ratings, and seller information.
+- **ManoMano Product API** — Read a ManoMano product URL and return the title, price, seller, and EAN.
+- **ManoMano Product Offer API** — List the other sellers for a ManoMano product id.
+- **ManoMano Search API** — Read a ManoMano category or search URL and return product cards with price and pagination.
 
 Use it for price monitoring, assortment tracking, competitor analysis, product research or catalog enrichment.
 
 | Endpoint | Path | Credits | What you get |
 |---|---|---|---|
-| [ManoMano Product API](#manomano-product-api) | `/v2/manomano/product` | 1 | Extract full product details from a ManoMano product page, including price, seller, brand, images, variants, and stock. |
-| [ManoMano Product Offer API](#manomano-product-offer-api) | `/v2/manomano/product/offer` | 1 | Get all marketplace seller offers for a ManoMano product by product ID, including pricing, shipping, and seller information. |
-| [ManoMano Search API](#manomano-search-api) | `/v2/manomano/search` | 1 | Search for products on ManoMano by category or keyword URL, returning listings with prices, ratings, and seller information. |
+| [ManoMano Product API](#manomano-product-api) | `/v2/manomano/product` | 2 | Read a ManoMano product URL and return the title, price, seller, and EAN. |
+| [ManoMano Product Offer API](#manomano-product-offer-api) | `/v2/manomano/product/offer` | 1 | List the other sellers for a ManoMano product id. |
+| [ManoMano Search API](#manomano-search-api) | `/v2/manomano/search` | 2 | Read a ManoMano category or search URL and return product cards with price and pagination. |
 
 ## Table of contents
 
@@ -49,9 +49,9 @@ pip install requests        # Python
 
 ## ManoMano Product API
 
-Extract full product details from a ManoMano product page, including price, seller, brand, images, variants, and stock.
+Read a ManoMano product URL and return the title, price, seller, and EAN.
 
-`GET | POST https://api.piloterr.com/v2/manomano/product` · **1 credit per request** · [Full reference](https://app.piloterr.com/openapi)
+`GET | POST https://api.piloterr.com/v2/manomano/product` · **2 credits per request** · [Full reference](https://app.piloterr.com/openapi)
 
 ### Request parameters
 
@@ -85,55 +85,30 @@ print(json.dumps(data, indent=2, ensure_ascii=False)[:2000])
 ```typescript
 type ManomanoProduct = {
   ean?: string;
-  brand?: {
-    id?: number;
-    url?: string;
-    name?: string;
-  };
-  media?: {
-    type?: string;
-    large_url?: string;
-    regular_url?: string;
-    thumbnail_url?: string;
-  }[];
+  url?: string;
+  brand?: string;
+  image?: string;
   mm_id?: number;
-  price?: {
-    primary_price?: {
-      amount_with_vat?: number;
-      measurement_unit?: string;
-      amount_without_vat?: number;
-    };
-    discount_percentage?: number;
-    eco_participation_with_vat?: number;
-  };
-  stock?: {
-    minimum_value?: number;
-    increase_quantity?: number;
-  };
+  price?: number;
   title?: string;
-  seller?: {
-    id?: number;
-    url?: string;
-    name?: string;
-    country?: string;
-  };
+  images?: string[];
+  brand_id?: number;
   currency?: string;
-  delivery?: {
-    weight?: number;
-    fulfillment?: boolean;
-  };
+  in_stock?: boolean;
   model_id?: number;
   offer_id?: string;
-  quantity?: {
-    stock?: unknown;
-    value?: number;
-  };
-  variants?: {
-    list?: {
-      name?: string;
-      values?: Record<string, unknown>[];
-    }[];
-  };
+  brand_url?: string;
+  seller_id?: number;
+  article_id?: number;
+  product_id?: number;
+  description?: string;
+  seller_name?: string;
+  price_display?: string;
+  original_price?: number;
+  seller_country?: string;
+  discount_percentage?: number;
+  other_sellers_count?: number;
+  original_price_display?: string;
 };
 
 const params = new URLSearchParams({
@@ -168,62 +143,33 @@ Example response from the API reference, abridged — real values depend on the 
 
 ```json
 {
-  "ean": "3662970077672",
-  "brand": {
-    "id": 6502,
-    "url": "/marque/outsunny-6502",
-    "name": "OUTSUNNY"
-  },
-  "media": [
-    {
-      "type": "image",
-      "large_url": "https://cdn.manomano.com/images/images_products/6132097/L/28916742_1.jpg",
-      "regular_url": "https://cdn.manomano.com/images/images_products/6132097/P/28916742_1.jpg",
-      "thumbnail_url": "https://cdn.manomano.com/images/images_products/6132097/T/28916742_1.jpg"
-    }
+  "ean": "0088381804882",
+  "url": "https://www.manomano.fr/p/perceuse-visseuse-lxt-makita-18-v-3-ah-84523637?product_id=158588345",
+  "brand": "MAKITA",
+  "image": "https://cdn.manomano.com/pim-media/images/large/9c7e21d66ddc6c646bd8aab8aa145e620dcb2cac.jpg",
+  "mm_id": 266848842586,
+  "price": 214.96,
+  "title": "Makita – Perceuse-visseuse 18V DDF482SFE – 2 batteries 3Ah – Moteur Brushless – Couple 64Nm – Coffret avec chargeur",
+  "images": [
+    "https://cdn.manomano.com/pim-media/images/large/9c7e21d66ddc6c646bd8aab8aa145e620dcb2cac.jpg"
   ],
-  "mm_id": 127463740566,
-  "price": {
-    "primary_price": {
-      "amount_with_vat": 335.9,
-      "measurement_unit": "",
-      "amount_without_vat": 279.92
-    },
-    "discount_percentage": 0,
-    "eco_participation_with_vat": 5.25
-  },
-  "stock": {
-    "minimum_value": 1,
-    "increase_quantity": 1
-  },
-  "title": "Pergola rétractable OUTSUNNY - 2,98L x 2,13l x 2,22H m - Structure métal époxy anticorrosion",
-  "seller": {
-    "id": 0,
-    "url": "example",
-    "name": "example",
-    "country": "example"
-  },
+  "brand_id": 16,
   "currency": "EUR",
-  "delivery": {
-    "weight": 40,
-    "fulfillment": true
-  },
-  "model_id": 17784588,
-  "offer_id": "afa4d772-b372-4f8a-b3d0-0f37ee205b58",
-  "quantity": {
-    "stock": null,
-    "value": 1
-  },
-  "variants": {
-    "list": [
-      {
-        "name": "couleur",
-        "values": [
-          {}
-        ]
-      }
-    ]
-  }
+  "in_stock": true,
+  "model_id": 89580210,
+  "offer_id": "f85116da-cfef-4467-8e38-a71a5b08aa37",
+  "brand_url": "https://www.manomano.fr/marque/makita-16",
+  "seller_id": 12,
+  "article_id": 84523637,
+  "product_id": 158588345,
+  "description": "Description générale La perceuse visseuse 18V 3Ah DDF482SFE de Makita est un outil puissant et compact, idéal pour les travaux quotidiens…",
+  "seller_name": "example",
+  "price_display": "214,96 €",
+  "original_price": 385.55,
+  "seller_country": "FR",
+  "discount_percentage": 44,
+  "other_sellers_count": 6,
+  "original_price_display": "385,55 €"
 }
 ```
 
@@ -232,34 +178,34 @@ Example response from the API reference, abridged — real values depend on the 
 | Field | Type | Description |
 |---|---|---|
 | `ean` | string |  |
-| `brand` | object |  |
-| `brand.id` | integer |  |
-| `brand.url` | string |  |
-| `brand.name` | string |  |
-| `media[]` | object[] |  |
-| `media[].type` | string |  |
-| `media[].large_url` | string |  |
-| `media[].regular_url` | string |  |
-| `media[].thumbnail_url` | string |  |
+| `url` | string |  |
+| `brand` | string |  |
+| `image` | string |  |
 | `mm_id` | integer |  |
-| `price` | object |  |
-| `price.primary_price` | object |  |
-| `price.discount_percentage` | integer |  |
-| `price.eco_participation_with_vat` | number |  |
-| `stock` | object |  |
-| `stock.minimum_value` | integer |  |
-| `stock.increase_quantity` | integer |  |
+| `price` | number |  |
 | `title` | string |  |
-| `seller` | object |  |
-| `seller.id` | integer |  |
-| `seller.url` | string |  |
-| `seller.name` | string |  |
-| `seller.country` | string |  |
+| `images` | string[] |  |
+| `brand_id` | integer |  |
 | `currency` | string |  |
+| `in_stock` | boolean |  |
+| `model_id` | integer |  |
+| `offer_id` | string |  |
+| `brand_url` | string |  |
+| `seller_id` | integer |  |
+| `article_id` | integer |  |
+| `product_id` | integer |  |
+| `description` | string |  |
+| `seller_name` | string |  |
+| `price_display` | string |  |
+| `original_price` | number |  |
+| `seller_country` | string |  |
+| `discount_percentage` | integer |  |
+| `other_sellers_count` | integer |  |
+| `original_price_display` | string |  |
 
 ## ManoMano Product Offer API
 
-Get all marketplace seller offers for a ManoMano product by product ID, including pricing, shipping, and seller information.
+List the other sellers for a ManoMano product id.
 
 `GET | POST https://api.piloterr.com/v2/manomano/product/offer` · **1 credit per request** · [Full reference](https://app.piloterr.com/openapi)
 
@@ -300,30 +246,16 @@ type ManomanoProductOffer = {
   results?: {
     sku?: {
       title?: string;
-      master_product?: Record<string, unknown>;
     };
+    price?: number;
     market?: string;
     seller?: {
       is_m_f?: boolean;
       contract_id?: string;
-      contract_name?: string;
-      country_location?: string;
-    };
-    pricing?: {
-      sell_price?: Record<string, unknown>;
-      retail_price?: unknown;
-      eco_participation?: Record<string, unknown>;
-    };
-    packaging?: {
-      increment?: string;
-      minimum_quantity?: string;
     };
     product_id?: string;
     is_sellable?: boolean;
-    delivery_offers?: {
-      estimate_delivery?: Record<string, unknown>;
-      delivery_countries?: string[];
-    }[];
+    price_display?: string;
   }[];
 };
 
@@ -360,34 +292,21 @@ Example response from the API reference, abridged — real values depend on the 
 
 ```json
 {
-  "count": 2,
+  "count": 6,
   "results": [
     {
       "sku": {
-        "title": "Modern single basin sink mixer tap slotted drain curved spout chrome bathroom",
-        "master_product": {}
+        "title": "Makita – Perceuse-visseuse 18V DDF482SFE"
       },
+      "price": 214.96,
       "market": "B2C",
       "seller": {
         "is_m_f": false,
-        "contract_id": "example",
-        "contract_name": "example",
-        "country_location": "example"
+        "contract_id": "example"
       },
-      "pricing": {
-        "sell_price": {},
-        "retail_price": null,
-        "eco_participation": {}
-      },
-      "packaging": {
-        "increment": "1",
-        "minimum_quantity": "1"
-      },
-      "product_id": "137641413",
+      "product_id": "359528470",
       "is_sellable": true,
-      "delivery_offers": [
-        {}
-      ]
+      "price_display": "214,96 €"
     }
   ]
 }
@@ -400,19 +319,18 @@ Example response from the API reference, abridged — real values depend on the 
 | `count` | integer |  |
 | `results[]` | object[] |  |
 | `results[].sku` | object |  |
+| `results[].price` | number |  |
 | `results[].market` | string |  |
 | `results[].seller` | object |  |
-| `results[].pricing` | object |  |
-| `results[].packaging` | object |  |
 | `results[].product_id` | string |  |
 | `results[].is_sellable` | boolean |  |
-| `results[].delivery_offers[]` | object[] |  |
+| `results[].price_display` | string |  |
 
 ## ManoMano Search API
 
-Search for products on ManoMano by category or keyword URL, returning listings with prices, ratings, and seller information.
+Read a ManoMano category or search URL and return product cards with price and pagination.
 
-`GET | POST https://api.piloterr.com/v2/manomano/search` · **1 credit per request** · [Full reference](https://app.piloterr.com/openapi)
+`GET | POST https://api.piloterr.com/v2/manomano/search` · **2 credits per request** · [Full reference](https://app.piloterr.com/openapi)
 
 ### Request parameters
 
@@ -446,28 +364,34 @@ print(json.dumps(data, indent=2, ensure_ascii=False)[:2000])
 ```typescript
 type ManomanoSearch = {
   results?: {
-    cpc?: number;
     url?: string;
-    bulk?: boolean;
+    brand?: string;
+    is_mf?: boolean;
+    price?: number;
     title?: string;
-    is_b2b?: boolean;
-    is_mmf?: boolean;
-    prices?: {
-      main?: number;
-      unit?: unknown;
-      retail?: number;
-      discount?: string;
-      secondary?: unknown;
-    };
+    is_pro?: boolean;
     rating?: number;
-    brand_id?: number;
-    is_local?: boolean;
-    model_id?: number;
-    offer_id?: string;
-    position?: number;
-    seller_id?: number;
-    article_id?: number;
+    currency?: string;
+    in_stock?: boolean;
+    model_id?: string;
+    seller_id?: string;
+    article_id?: string;
+    product_id?: string;
+    seller_name?: string;
+    rating_count?: number;
+    price_display?: string;
+    delivery_label?: string;
+    original_price?: number;
+    discount_percentage?: number;
+    original_price_display?: string;
   }[];
+  pagination?: {
+    next?: string;
+    page?: number;
+    per_page?: number;
+    total_pages?: number;
+    total_results?: number;
+  };
 };
 
 const params = new URLSearchParams({
@@ -504,48 +428,35 @@ Example response from the API reference, abridged — real values depend on the 
 {
   "results": [
     {
-      "cpc": 0.1,
-      "url": "https://www.manomano.fr/makita-perceuse-visseuse-18v-3x3ah-ddf484rf3j",
-      "bulk": false,
-      "title": "Perceuse visseuse 18V Ø 13 mm - MAKITA - Avec 2 batteries 18V Li-Ion 5.0 Ah, chargeur, MakPak- DDF484RTJ",
-      "is_b2b": false,
-      "is_mmf": true,
-      "prices": {
-        "main": 277.2,
-        "unit": null,
-        "retail": 569.16,
-        "discount": "51",
-        "secondary": null
-      },
-      "rating": 4.589109,
-      "brand_id": 16,
-      "is_local": false,
-      "model_id": 54973303,
-      "offer_id": "d63853b8-314b-4de0-8cd8-fc9c993fe6f6",
-      "position": 1,
-      "seller_id": 5307819,
-      "article_id": 78566961
-    },
-    {
-      "url": "https://www.manomano.fr/dewalt-perceuse-visseuse-18v-dcd778d2t",
-      "bulk": false,
-      "title": "Perceuse visseuse sans fil 18V - DEWALT - DCD778D2T",
-      "is_b2b": false,
-      "is_mmf": false,
-      "prices": {
-        "main": 149.99,
-        "unit": null,
-        "retail": 199.99,
-        "discount": "25",
-        "secondary": null
-      },
-      "rating": 4.72,
-      "model_id": 12345678,
-      "offer_id": "abc123-def456",
-      "position": 2,
-      "article_id": 12345678
+      "url": "https://www.manomano.fr/p/perceuse-visseuse-lxt-makita-18-v-3-ah-84523637?product_id=158588345",
+      "brand": "MAKITA",
+      "is_mf": false,
+      "price": 214.96,
+      "title": "Makita – Perceuse-visseuse 18V DDF482SFE – 2 batteries 3Ah – Moteur Brushless – Couple 64Nm – Coffret avec chargeur",
+      "is_pro": false,
+      "rating": 4.57,
+      "currency": "EUR",
+      "in_stock": true,
+      "model_id": "89580210",
+      "seller_id": "12",
+      "article_id": "84523637",
+      "product_id": "158588345",
+      "seller_name": "example",
+      "rating_count": 7,
+      "price_display": "214,96 €",
+      "delivery_label": "Livraison gratuite",
+      "original_price": 385.55,
+      "discount_percentage": 44,
+      "original_price_display": "385,55 €"
     }
-  ]
+  ],
+  "pagination": {
+    "next": "https://www.manomano.fr/perceuse-1146?page=2",
+    "page": 1,
+    "per_page": 56,
+    "total_pages": 100,
+    "total_results": 6000
+  }
 }
 ```
 
@@ -554,21 +465,30 @@ Example response from the API reference, abridged — real values depend on the 
 | Field | Type | Description |
 |---|---|---|
 | `results[]` | object[] |  |
-| `results[].cpc` | number |  |
 | `results[].url` | string |  |
-| `results[].bulk` | boolean |  |
+| `results[].brand` | string |  |
+| `results[].is_mf` | boolean |  |
+| `results[].price` | number |  |
 | `results[].title` | string |  |
-| `results[].is_b2b` | boolean |  |
-| `results[].is_mmf` | boolean |  |
-| `results[].prices` | object |  |
+| `results[].is_pro` | boolean |  |
 | `results[].rating` | number |  |
-| `results[].brand_id` | integer |  |
-| `results[].is_local` | boolean |  |
-| `results[].model_id` | integer |  |
-| `results[].offer_id` | string |  |
-| `results[].position` | integer |  |
-| `results[].seller_id` | integer |  |
-| `results[].article_id` | integer |  |
+| `results[].currency` | string |  |
+| `results[].in_stock` | boolean |  |
+| `results[].model_id` | string |  |
+| `results[].seller_id` | string |  |
+| `results[].article_id` | string |  |
+| `results[].product_id` | string |  |
+| `results[].seller_name` | string |  |
+| `results[].rating_count` | integer |  |
+| `results[].price_display` | string |  |
+| `results[].delivery_label` | string |  |
+| `results[].original_price` | number |  |
+| `results[].discount_percentage` | integer |  |
+| `results[].original_price_display` | string |  |
+| `pagination` | object |  |
+| `pagination.next` | string |  |
+| `pagination.page` | integer |  |
+| `pagination.per_page` | integer |  |
 
 ## Code examples in other languages
 
@@ -612,11 +532,11 @@ No. Piloterr handles rendering, proxy rotation and retries on its side. You only
 
 ### How much does a request cost?
 
-Credits per call: `/v2/manomano/product` **1**, `/v2/manomano/product/offer` **1**, `/v2/manomano/search` **1**. See the [Piloterr website](https://www.piloterr.com) for plans.
+Credits per call: `/v2/manomano/product` **2**, `/v2/manomano/product/offer` **1**, `/v2/manomano/search` **2**. See the [Piloterr website](https://www.piloterr.com) for plans.
 
 ### What data does the ManoMano API return?
 
-Each endpoint returns structured JSON: **ManoMano Product** — `ean`, `brand`, `brand.id`, `brand.url`, `brand.name`, `media[]`; **ManoMano Product Offer** — `count`, `results[]`, `results[].sku`, `results[].market`, `results[].seller`, `results[].pricing`; **ManoMano Search** — `results[]`, `results[].cpc`, `results[].url`, `results[].bulk`, `results[].title`, `results[].is_b2b`.
+Each endpoint returns structured JSON: **ManoMano Product** — `ean`, `url`, `brand`, `image`, `mm_id`, `price`; **ManoMano Product Offer** — `count`, `results[]`, `results[].sku`, `results[].price`, `results[].market`, `results[].seller`; **ManoMano Search** — `results[]`, `results[].url`, `results[].brand`, `results[].is_mf`, `results[].price`, `results[].title`.
 
 ### Can I target a specific country or language?
 
